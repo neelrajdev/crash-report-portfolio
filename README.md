@@ -43,11 +43,19 @@ npm run deploy   # rebuild AI index + build + deploy to Cloudflare Pages
 
 ## Hosting
 
-Live on **Cloudflare Pages**: https://crash-report-portfolio.pages.dev
+Live on **Cloudflare Pages**: https://neelrajdev.pages.dev
 
-Deploys are done from the local workspace with Wrangler (`npm run deploy`) —
-the RAG index is rebuilt from live GitHub data on every deploy, so the AI's
-knowledge stays current. The GitHub repo remains the source of truth for code.
+**Deploys are fully automated:**
+
+- **Push to `main`** → pipeline runs (rebuild AI index from live GitHub data →
+  typecheck + build → deploy to Pages)
+- **One-click manual deploy** → repo *Actions* tab → *Deploy to Cloudflare
+  Pages* → **Run workflow** — ships whatever is on `main`
+- **Nightly** → the AI index refreshes from GitHub even without pushes
+
+> The URL is portfolio-agnostic: it's tied to the account, not this project.
+> To swap in a completely different site, replace `src/` and deploy — the
+> URL, pipeline, and AI plumbing stay identical.
 
 ## License
 

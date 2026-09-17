@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:index": "node scripts/build-index.mjs",
-    "deploy": "npm run build:index && npm run build && wrangler pages deploy dist --project-name crash-report-portfolio",
+    "deploy": "npm run build:index && npm run build && wrangler pages deploy dist --project-name neelrajdev",
     "preview": "vite preview"
   },
   "dependencies": {

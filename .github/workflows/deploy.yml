@@ -53,7 +53,7 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         if: steps.guard.outputs.has_token == 'true'
-        run: npx wrangler pages deploy dist --project-name=crash-report-portfolio --branch=main
+        run: npx wrangler pages deploy dist --project-name=neelrajdev --branch=main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
