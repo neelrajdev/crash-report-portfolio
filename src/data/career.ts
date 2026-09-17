@@ -20,7 +20,13 @@ export const exception = {
   code: "CAREER_OVERFLOW",
   message:
     "The story you are about to read could not be contained in a resume.",
-  hint: "Hint: expand the frames below. Every crash is a chapter.",
+  hint: "Paused on exception — F8 to resume, F10 to step through the frames.",
+};
+
+export const identity = {
+  name: "neelrajdev",
+  role: "developer-in-training",
+  runtime: "neelraj-os 5.1.0",
 };
 
 export const frames: StackFrame[] = [

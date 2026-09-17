@@ -1,13 +1,13 @@
 import { contact } from "../data/career";
 import { CrashHeader } from "./CrashHeader";
-import { StackTrace } from "./StackTrace";
+import { Debugger } from "./Debugger";
 import { AIPanel } from "./AIPanel";
 
 export function CrashReport() {
   return (
-    <main className="mx-auto max-w-4xl px-5 py-10 sm:px-8 sm:py-14">
+    <main className="mx-auto max-w-5xl px-4 py-10 sm:px-8 sm:py-14">
       <CrashHeader />
-      <StackTrace />
+      <Debugger />
       <AIPanel />
       <footer className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-crash-line pt-6 font-mono text-sm">
         <span className="text-crash-dim">

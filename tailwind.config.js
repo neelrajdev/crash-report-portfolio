@@ -11,6 +11,7 @@ export default {
           red: "#ff3b47",
           amber: "#ffb454",
           green: "#3ddc84",
+          blue: "#4d9fff",
           dim: "#8b8b93",
         },
       },
@@ -34,16 +35,16 @@ export default {
           "60%": { transform: "translate(-1px, -1px)" },
           "80%": { transform: "translate(1px, 1px)" },
         },
-        scan: {
-          "0%": { transform: "translateY(-100%)" },
-          "100%": { transform: "translateY(100vh)" },
+        flash: {
+          "0%": { backgroundColor: "rgba(61, 220, 132, 0.25)" },
+          "100%": { backgroundColor: "rgba(61, 220, 132, 0)" },
         },
       },
       animation: {
         rise: "rise 0.5s ease-out both",
         flicker: "flicker 4s infinite",
         glitch: "glitchShift 0.3s steps(2) 3",
-        scan: "scan 7s linear infinite",
+        flash: "flash 0.9s ease-out",
       },
     },
   },
