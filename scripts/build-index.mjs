@@ -1,18 +1,17 @@
 /**
- * RAG index builder — corpus: public GitHub repos (readme + recent commit
- * subjects) + the career story from src/data/career.json.
+ * RAG index + live repo list builder.
  *
- * Embeddings: Xenova/all-MiniLM-L6-v2 via @huggingface/transformers (local,
- * free, no API keys). Output: public/rag-index.json — a static file the
- * browser RAG retrieves from.
+ * Outputs:
+ *  - public/rag-index.json : corpus (career story + repos) with embeddings
+ *  - public/repos.json     : repo metadata for the projects panel
+ *                            (pinned-first, CI status, 10-week commit activity)
  *
  * Run: node scripts/build-index.mjs [github_user]
  */
-import { readdirSync, writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync } from "node:fs";
 import { pipeline } from "@huggingface/transformers";
 
 const USER = process.argv[2] ?? "neelrajdev";
-const OUT = "public/rag-index.json";
 const API = "https://api.github.com";
 
 const headers = {
@@ -27,10 +26,28 @@ async function gh(path) {
   return res.json();
 }
 
-// ---------- corpus ----------
+// ---------- repo data ----------
 async function fetchRepos() {
   const repos = await gh(`/users/${USER}/repos?per_page=100&sort=updated`);
   return repos.filter((r) => !r.fork && !r.archived);
+}
+
+/** pinned repo names, in the order the user pinned them (GraphQL; [] if no token) */
+async function fetchPinned() {
+  if (!process.env.GITHUB_TOKEN) return [];
+  try {
+    const res = await fetch(`${API}/graphql`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        query: `{ user(login: "${USER}") { pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { name } } } } }`,
+      }),
+    });
+    const json = await res.json();
+    return json?.data?.user?.pinnedItems?.nodes?.map((n) => n.name) ?? [];
+  } catch {
+    return [];
+  }
 }
 
 async function fetchReadme(repo) {
@@ -42,15 +59,49 @@ async function fetchReadme(repo) {
   }
 }
 
-async function fetchCommits(repo) {
+/** last ~100 default-branch commits → { subjects, activity: 10 weekly buckets } */
+async function fetchCommitData(repo) {
   try {
-    const commits = await gh(`/repos/${USER}/${repo.name}/commits?per_page=20`);
-    return commits
-      .map((c) => c.commit?.message?.split("\n")[0])
-      .filter(Boolean)
-      .slice(0, 15);
+    const commits = await gh(
+      `/repos/${USER}/${repo.name}/commits?per_page=100&sha=${repo.default_branch}`,
+    );
+    const now = Date.now();
+    const WEEK = 7 * 24 * 3600 * 1000;
+    const activity = new Array(10).fill(0);
+    const subjects = [];
+    for (const c of commits) {
+      const date = Date.parse(c.commit?.author?.date ?? "");
+      if (Number.isFinite(date)) {
+        const age = Math.floor((now - date) / WEEK);
+        if (age >= 0 && age < 10) activity[9 - age] += 1;
+      }
+      if (subjects.length < 15) {
+        const subject = c.commit?.message?.split("\n")[0];
+        if (subject) subjects.push(subject);
+      }
+    }
+    return { subjects, activity };
   } catch {
-    return [];
+    return { subjects: [], activity: new Array(10).fill(0) };
+  }
+}
+
+/** latest workflow run on the default branch → passing | failing | running | null */
+async function fetchCi(repo) {
+  try {
+    const data = await gh(
+      `/repos/${USER}/${repo.name}/actions/runs?per_page=6`,
+    );
+    const run = (data.workflow_runs ?? []).find(
+      (r) => r.head_branch === repo.default_branch,
+    );
+    if (!run) return null;
+    if (run.status && run.status !== "completed") return "running";
+    if (run.conclusion === "success") return "passing";
+    if (run.conclusion === null) return null;
+    return "failing";
+  } catch {
+    return null;
   }
 }
 
@@ -70,24 +121,13 @@ function chunkText(text, max = 900) {
   return chunks;
 }
 
-async function writeRepoList() {
-  const repos = await fetchRepos();
-  const list = repos.map((r) => ({
-    name: r.name,
-    description: r.description,
-    language: r.language,
-    stars: r.stargazers_count,
-    url: r.html_url,
-    updatedAt: r.updated_at,
-    homepage: r.homepage || null,
-  }));
-  writeFileSync("public/repos.json", JSON.stringify({ updated: new Date().toISOString(), repos: list }));
-  console.log(`wrote public/repos.json with ${list.length} repos`);
-  return repos;
-}
+// ---------- build corpus + repo list ----------
+async function buildAll() {
+  const [repos, pinned] = await Promise.all([fetchRepos(), fetchPinned()]);
+  console.log(`found ${repos.length} repos for ${USER} (${pinned.length} pinned)`);
 
-async function buildCorpus() {
   const corpus = [];
+  const repoList = [];
 
   // career story frames — highest-quality chunks, always cited
   const story = await import("../src/data/career.json", {
@@ -103,14 +143,13 @@ async function buildCorpus() {
     });
   }
 
-  // repos
-  const repos = await writeRepoList();
-  console.log(`found ${repos.length} repos for ${USER}`);
   for (const repo of repos) {
-    const [readme, commits] = await Promise.all([
+    const [readme, commitData, ci] = await Promise.all([
       fetchReadme(repo),
-      fetchCommits(repo),
+      fetchCommitData(repo),
+      fetchCi(repo),
     ]);
+
     const about = `${repo.name}: ${repo.description ?? "no description"}. Language: ${repo.language ?? "unknown"}.`;
     corpus.push({
       source: `repo:${repo.name}`,
@@ -118,18 +157,37 @@ async function buildCorpus() {
       url: repo.html_url,
       text: chunkText(`${about}\n\n${readme}`)[0] || about,
     });
-    if (commits.length) {
+    if (commitData.subjects.length) {
       corpus.push({
         source: `commits:${repo.name}`,
         title: `recent work on ${repo.name}`,
         url: `${repo.html_url}/commits`,
-        text: `Recent commit history of ${repo.name}: ${commits.join("; ")}`,
+        text: `Recent commit history of ${repo.name}: ${commitData.subjects.join("; ")}`,
       });
     }
-    console.log(`  + ${repo.name} (readme ${readme.length}b, ${commits.length} commits)`);
+
+    repoList.push({
+      name: repo.name,
+      description: repo.description,
+      language: repo.language,
+      stars: repo.stargazers_count,
+      url: repo.html_url,
+      updatedAt: repo.updated_at,
+      homepage: repo.homepage || null,
+      pinned: pinned.includes(repo.name),
+      ci,
+      activity: commitData.activity,
+    });
+    console.log(
+      `  + ${repo.name} (readme ${readme.length}b, ${commitData.subjects.length} commits, ci: ${ci ?? "n/a"})`,
+    );
   }
 
-  return corpus;
+  // pinned first (in pin order), then the rest by last update
+  const rank = (r) => (r.pinned ? pinned.indexOf(r.name) : Number.MAX_SAFE_INTEGER);
+  repoList.sort((a, b) => rank(a) - rank(b) || b.updatedAt.localeCompare(a.updatedAt));
+
+  return { corpus, repoList };
 }
 
 // ---------- embeddings ----------
@@ -151,21 +209,25 @@ async function embedAll(corpus) {
 }
 
 // ---------- main ----------
-const corpus = await buildCorpus();
+const { corpus, repoList } = await buildAll();
 if (!corpus.length) {
   console.error("no corpus gathered — check username/network");
   process.exit(1);
 }
+
+writeFileSync(
+  "public/repos.json",
+  JSON.stringify({ updated: new Date().toISOString(), repos: repoList }),
+);
+console.log(`wrote public/repos.json with ${repoList.length} repos`);
+
 const vectors = await embedAll(corpus);
 writeFileSync(
-  OUT,
-  JSON.stringify(
-    {
-      model: "Xenova/all-MiniLM-L6-v2",
-      builtAt: new Date().toISOString(),
-      docs: corpus.map((d, i) => ({ ...d, vec: vectors[i] })),
-    },
-    null, // no pretty print — vectors are bulky
-  ),
+  "public/rag-index.json",
+  JSON.stringify({
+    model: "Xenova/all-MiniLM-L6-v2",
+    builtAt: new Date().toISOString(),
+    docs: corpus.map((d, i) => ({ ...d, vec: vectors[i] })),
+  }),
 );
-console.log(`wrote ${OUT} with ${corpus.length} docs`);
+console.log(`wrote public/rag-index.json with ${corpus.length} docs`);
