@@ -6,50 +6,54 @@
     "hint": "Paused on exception — F8 to resume, F10 to step through the frames."
   },
   "identity": {
-    "name": "neelrajdev",
-    "role": "developer-in-training",
+    "name": "Neel Raj",
+    "handle": "neelrajdev",
+    "role": "CS student · AI tools builder",
     "runtime": "neelraj-os 5.1.0"
   },
   "frames": [
     {
-      "fn": "Chapter4.enteringTheArena",
+      "fn": "Chapter4.buildingTheCrash",
       "file": "src/career/present.tsx",
       "line": 404,
-      "title": "Right now — learning in public",
-      "body": "Building AI-flavored tools, breaking things on purpose, and writing down what happened. This portfolio is the log file.",
-      "stack": ["TypeScript", "React", "LLM APIs"],
+      "title": "Right now — AI tools, and this crash site",
+      "body": "College by day, building AI-flavored tools by night. This portfolio is the current proof: a debugger that crashed on purpose, with a RAG brain that answers questions from my real GitHub data — entirely in your browser.",
+      "stack": ["Python", "LLM tooling", "TypeScript", "React"],
+      "links": [
+        { "label": "this repo", "href": "https://github.com/neelrajdev/crash-report-portfolio" }
+      ],
       "kind": "fatal"
     },
     {
-      "fn": "Chapter3.firstRealProjects",
+      "fn": "Chapter3.buildingForMyself",
       "file": "src/career/projects.ts",
       "line": 301,
-      "title": "First real projects — the phase where tutorials end",
-      "body": "Moved from following tutorials to shipping things nobody asked for but I needed. Learned that deployment is a feature, not an afterthought.",
-      "stack": ["Node.js", "Git", "APIs"],
+      "title": "Building for myself — the phase tutorials can't teach",
+      "body": "Stopped following tutorials and started making small tools I personally needed. Learned the two lessons that stick: shipping is a skill, and deployment is a feature — not an afterthought.",
+      "stack": ["Python", "Node.js", "Git"],
       "kind": "chapter"
     },
     {
-      "fn": "Chapter2.deepDive",
+      "fn": "Chapter2.fallingForAI",
       "file": "src/career/learning.ts",
       "line": 202,
-      "title": "Going deeper — data structures, systems, debugging",
-      "body": "Stopped copying code and started reading it. Learned to love the debugger and the error message that finally makes sense at 2am.",
-      "stack": ["JavaScript", "Python", "DSA"],
+      "title": "CS fundamentals — and falling down the AI rabbit hole",
+      "body": "Tech major, deep in data structures and systems. Then LLMs happened: prompting, embeddings, retrieval, agents. What started as curiosity became the thing I build toward every week.",
+      "stack": ["Python", "DSA", "LLM APIs"],
       "kind": "chapter"
     },
     {
       "fn": "Chapter1.helloWorld",
       "file": "src/career/origin.ts",
       "line": 101,
-      "title": "The first line of code",
-      "body": "Where it started: curiosity, a blank file, and a program that printed my own name. Nothing has been the same since.",
-      "stack": ["Curiosity", "HTML", "print()"],
+      "title": "The first line of code — audience of one",
+      "body": "Teenage me, wanting an app that didn't exist, realizing nobody was going to build it for me. The first script was clumsy and mine. That's still the whole philosophy: build it for yourself, learn it for real.",
+      "stack": ["Curiosity", "Python", "print()"],
       "kind": "chapter"
     }
   ],
   "contact": {
     "github": { "label": "github.com/neelrajdev", "href": "https://github.com/neelrajdev" },
-    "email": { "label": "say hello", "href": "mailto:hello@neelraj.dev" }
+    "email": { "label": "say hello", "href": "mailto:nr.neelrajdev@gmail.com" }
   }
 }
