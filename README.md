@@ -38,7 +38,16 @@ Vite · React 18 · TypeScript (strict) · Tailwind CSS
 npm install
 npm run dev      # local dev
 npm run build    # typecheck + production build
+npm run deploy   # rebuild AI index + build + deploy to Cloudflare Pages
 ```
+
+## Hosting
+
+Live on **Cloudflare Pages**: https://crash-report-portfolio.pages.dev
+
+Deploys are done from the local workspace with Wrangler (`npm run deploy`) —
+the RAG index is rebuilt from live GitHub data on every deploy, so the AI's
+knowledge stays current. The GitHub repo remains the source of truth for code.
 
 ## License
 

@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:index": "node scripts/build-index.mjs",
+    "deploy": "npm run build:index && npm run build && wrangler pages deploy dist --project-name crash-report-portfolio",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.6.2",
-    "vite": "^5.4.11"
+    "vite": "^5.4.11",
+    "wrangler": "^4.133.0"
   }
 }
