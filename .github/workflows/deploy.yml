@@ -36,6 +36,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Regenerate OG image
+        run: node scripts/make-og.mjs
+
       - name: Build (typecheck + bundle)
         run: npm run build
 

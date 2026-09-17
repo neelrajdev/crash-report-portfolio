@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:index": "node scripts/build-index.mjs",
+    "build:og": "node scripts/make-og.mjs",
     "deploy": "npm run build:index && npm run build && wrangler pages deploy dist --project-name neelrajdev",
     "preview": "vite preview"
   },
@@ -16,6 +17,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
