@@ -70,6 +70,22 @@ function chunkText(text, max = 900) {
   return chunks;
 }
 
+async function writeRepoList() {
+  const repos = await fetchRepos();
+  const list = repos.map((r) => ({
+    name: r.name,
+    description: r.description,
+    language: r.language,
+    stars: r.stargazers_count,
+    url: r.html_url,
+    updatedAt: r.updated_at,
+    homepage: r.homepage || null,
+  }));
+  writeFileSync("public/repos.json", JSON.stringify({ updated: new Date().toISOString(), repos: list }));
+  console.log(`wrote public/repos.json with ${list.length} repos`);
+  return repos;
+}
+
 async function buildCorpus() {
   const corpus = [];
 
@@ -88,7 +104,7 @@ async function buildCorpus() {
   }
 
   // repos
-  const repos = await fetchRepos();
+  const repos = await writeRepoList();
   console.log(`found ${repos.length} repos for ${USER}`);
   for (const repo of repos) {
     const [readme, commits] = await Promise.all([

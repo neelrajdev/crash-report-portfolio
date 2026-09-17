@@ -1,6 +1,7 @@
 import { contact } from "../data/career";
 import { CrashHeader } from "./CrashHeader";
 import { Debugger } from "./Debugger";
+import { RepoPanel } from "./RepoPanel";
 import { AIPanel } from "./AIPanel";
 
 export function CrashReport() {
@@ -8,6 +9,7 @@ export function CrashReport() {
     <main className="mx-auto max-w-5xl px-4 py-10 sm:px-8 sm:py-14">
       <CrashHeader />
       <Debugger />
+      <RepoPanel />
       <AIPanel />
       <footer className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-crash-line pt-6 font-mono text-sm">
         <span className="text-crash-dim">
