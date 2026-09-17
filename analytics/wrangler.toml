@@ -1,0 +1,7 @@
+name = "crash-analytics"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+[[kv_namespaces]]
+binding = "CRASHES"
+id = "4dfcf549fc0a4e0c9d312293bcbb348a"

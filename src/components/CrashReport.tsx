@@ -2,6 +2,7 @@ import { contact } from "../data/career";
 import { CrashHeader } from "./CrashHeader";
 import { Debugger } from "./Debugger";
 import { RepoPanel } from "./RepoPanel";
+import { CrashCounter } from "./CrashCounter";
 import { AIPanel } from "./AIPanel";
 
 export function CrashReport() {
@@ -14,6 +15,8 @@ export function CrashReport() {
       <footer className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-crash-line pt-6 font-mono text-sm">
         <span className="text-crash-dim">
           core dumped → <span className="text-crash-green">/dev/recruiter</span>
+          {" · "}
+          <CrashCounter />
         </span>
         <div className="flex gap-5">
           <a
