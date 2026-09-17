@@ -3,3 +3,6 @@ dist
 *.local
 .DS_Store
 .freebuff/
+
+# gitstory lives in its own repo
+gitstory-external/
