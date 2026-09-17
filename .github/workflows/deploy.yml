@@ -33,6 +33,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Rebuild RAG index from live repos
+        run: node scripts/build-index.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build (typecheck + bundle)
         run: npm run build
 
