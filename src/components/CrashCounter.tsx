@@ -23,14 +23,17 @@ export function CrashCounter() {
 
   if (!stats) return null;
   return (
-    <span
-      className="text-crash-dim"
-      title="aggregate, cookieless visits — counted by my own Cloudflare Worker"
+    <a
+      href="https://crash-analytics.neelrajdev.workers.dev/"
+      target="_blank"
+      rel="noreferrer"
+      title="aggregate, cookieless visits — counted by my own Cloudflare Worker · click for the live dashboard"
+      className="text-crash-dim transition-colors hover:text-crash-green"
     >
       💥 {stats.total} crashes recorded
       {stats.today > 0 && (
         <span className="text-crash-dim/70"> ({stats.today} today)</span>
       )}
-    </span>
+    </a>
   );
 }
